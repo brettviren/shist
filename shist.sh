@@ -101,13 +101,18 @@ function shist-query () {
 }
         
 
+# these will persist into the next command environment and can be
+# useful inside PS1.
 __SHIST_NUM=""
 __SHIST_START=""
+__SHIST_DURATION=""
 __SHIST_COMMAND=""
+__SHIST_EXIT_CODE=""
 function __shist_postexec() {
     # record command
     local et=$(date +%s)
     local dt=$(( $et - $__SHIST_START ))
+    __SHIST_DURATION=$dt
 
     cat <<EOF | shist-query 
 INSERT INTO 
