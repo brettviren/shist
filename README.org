@@ -27,3 +27,22 @@ Store and query ~bash~ history in an sqlite3 database following [[https://github
 
 
 
+* Integrate with ~vcsh~
+
+Do you use [[https://github.com/RichiH/vcsh/][vcsh]]?  Of course you do.  Wanna add ~shist~ to your setup but
+keep connection to this repo?  Who wouldn't?  Assuming ~$HOME/.bash/~ is
+already under ~vcsh~ control as module "bash", one might do something
+like:
+
+#+begin_example
+  $ mkdir ~/.bash/subrees
+  $ vcsh bash remote add shist https://github.com/brettviren/shist.git
+  $ vcsh bash fetch shist
+  $ vcsh bash subtree add -P .bash/subtrees/shist -m "shist subtree" shist/master
+#+end_example
+
+Then:
+#+begin_example
+source $HOME/.bash/subtrees/shist/shist.sh
+#+end_example
+
