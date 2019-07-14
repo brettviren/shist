@@ -2,6 +2,21 @@
 
 SHIST_DB=$HOME/.shist.db
 
+function shist-ago () {
+    local when=$1 ; shift
+    local prec=${1:-1}; shift
+    cat <<EOF | shist-query
+    select datetime(start_time,'unixepoch','localtime'),command from commands where abs(start_time - strftime("%s", "$when")) < 3600*24*$prec;
+EOF
+}
+
+function shist-run () {
+    local cmd=$1; shift
+    eval $( shist-$cmd $@ | fzf -d'|' | sed -e 's/[^|]*|//')
+}
+
+# eval $(shist-algo 2010-01-01 1 | fzf -d'|' | sed -e 's/[^|]*|//')
+
 function shist-cwd () {
     cat <<EOF | shist-query
     select
