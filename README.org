@@ -39,6 +39,8 @@ like:
   $ vcsh bash remote add shist https://github.com/brettviren/shist.git
   $ vcsh bash fetch shist
   $ vcsh bash subtree add -P .bash/subtrees/shist -m "shist subtree" shist/master
+  (hack)
+  $ vcsh bash subtree push -P .bash/subtrees/shist shist master
 #+end_example
 
 Then:
