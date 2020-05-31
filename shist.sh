@@ -1,6 +1,24 @@
-
+# copyright 2020 brett.viren@gmail.com you may use this under the
+# terms of the GPLv3.  See LICENSE file for more info.
+# https://github.com/brettviren/shist
 
 SHIST_DB=$HOME/.shist.db
+SHIST_TIMEOUT=100
+
+function shist-ago () {
+    local when=$1 ; shift
+    local prec=${1:-1}; shift
+    cat <<EOF | shist-query
+    select datetime(start_time,'unixepoch','localtime'),command from commands where abs(start_time - strftime("%s", "$when")) < 3600*24*$prec;
+EOF
+}
+
+function shist-run () {
+    local cmd=$1; shift
+    eval $( shist-$cmd $@ | fzf -d'|' | sed -e 's/[^|]*|//')
+}
+
+# eval $(shist-algo 2010-01-01 1 | fzf -d'|' | sed -e 's/[^|]*|//')
 
 function shist-ago () {
     local when=$1 ; shift
@@ -130,6 +148,7 @@ function __shist_postexec() {
     __SHIST_DURATION=$dt
 
     cat <<EOF | shist-query 
+.timeout $SHIST_TIMEOUT
 INSERT INTO 
 commands(       'session_id','shell_level','command_no',  'tty',   'euid',  'cwd', 'rval',              'start_time',    'end_time','duration','pipe_cnt','pipe_vals','command')
 VALUES('$__SHIST_SESSION_ID','$SHLVL',     '$__SHIST_NUM','$(tty)','$EUID', '$PWD','$__SHIST_EXIT_CODE','$__SHIST_START','$et',     '$dt','$__SHIST_PIPESTATUS','',
@@ -183,6 +202,7 @@ function __shist_onexit() {
     local nt=$(date +%s)
     local dt=$(( $nt - $st ))
     cat <<EOF | shist-query
+.timeout $SHIST_TIMEOUT
 UPDATE sessions SET end_time = '$nt', duration = '$dt'
 WHERE id = '$__SHIST_SESSION_ID'
 EOF
